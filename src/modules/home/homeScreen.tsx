@@ -1,52 +1,23 @@
-import {   View,
+import {
+  View,
   Text,
   TouchableOpacity,
   StyleSheet,
   ScrollView,
   SafeAreaView,
-  StatusBar, } from 'react-native';
+  StatusBar,
+} from 'react-native';
 import { router } from 'expo-router';
 import Svg, { Path, Circle, Line } from 'react-native-svg';
 import styles from './homeStyles';
-import {WeatherCloudIcon, PlantStemIcon } from '@/assets/svg'
-
-const CROPS = [
-  {
-    id: '1',
-    parcela: 'Parcela 1',
-    nombre: 'Maíz',
-    ubicacion: 'Los Reyes, Michoacán',
-    alerta: 'Helada en 8 horas',
-    riesgo: 'ALTO',
-    emoji: '🌽',
-  },
-  {
-    id: '2',
-    parcela: 'Parcela 2',
-    nombre: 'Frijol',
-    ubicacion: 'Zamora, Michoacán',
-    alerta: 'Lluvia intensa mañana',
-    riesgo: 'MEDIO',
-    emoji: '🌿',
-  },
-  {
-    id: '3',
-    parcela: 'Parcela 3',
-    nombre: 'Tomate',
-    ubicacion: 'Sahuayo, Michoacán',
-    alerta: 'Condiciones favorables',
-    riesgo: 'BAJO',
-    emoji: '🍅',
-  },
-];
-
-const RIESGO_STYLES: Record<string, { bg: string; text: string }> = {
-  ALTO:  { bg: '#FFEBEE', text: '#E53935' },
-  MEDIO: { bg: '#FFF8E1', text: '#F9A825' },
-  BAJO:  { bg: '#E8F5E9', text: '#2E7D32' },
-};
+import { WeatherCloudIcon, PlantStemIcon } from '@/assets/svg'
+import { useParcelas } from '@/src/api/hooks/usesParcelas'
+import ParcelCard from '@/components/Parcelas/ParcelCard'
+import { useAppStore } from '@/src/store/useAppStore';
 
 export default function HomeScreen() {
+  const { parcelas } = useParcelas();
+  const user = useAppStore((s) => s.user);
   return (
     <SafeAreaView style={styles.safe}>
       <StatusBar barStyle="dark-content" backgroundColor="#F7F8F5" />
@@ -57,7 +28,9 @@ export default function HomeScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.greeting}>Hola, Juan</Text>
+          <Text style={styles.greeting}>
+            Hola, {user?.nombre_completo || 'Usuario'}
+          </Text>
         </View>
 
         {/* Alerta */}
@@ -83,40 +56,12 @@ export default function HomeScreen() {
         <Text style={styles.sectionTitle}>Mis cultivos</Text>
 
         <View style={styles.cropsContainer}>
-          {CROPS.map((crop, index) => {
-            const rs = RIESGO_STYLES[crop.riesgo];
-            return (
-              <TouchableOpacity
-                key={crop.id}
-                style={[
-                  styles.cropCard,
-                  index < CROPS.length - 1 && styles.cropCardBorder,
-                ]}
-                activeOpacity={0.75}
-              >
-                <Text style={styles.cropEmoji}>{crop.emoji}</Text>
-                <View style={styles.cropBody}>
-                  <Text style={styles.cropParcela}>{crop.parcela}</Text>
-                  <Text style={styles.cropNombre}>{crop.nombre}</Text>
-                  <Text style={styles.cropUbicacion}>{crop.ubicacion}</Text>
-                  <Text style={[styles.cropAlerta, { color: rs.text }]}>
-                    {crop.alerta}
-                  </Text>
-                </View>
-                <View style={styles.cropRight}>
-                  <View style={[styles.riesgoBadge, { backgroundColor: rs.bg }]}>
-                    <Text style={[styles.riesgoText, { color: rs.text }]}>
-                      {crop.riesgo}
-                    </Text>
-                  </View>
-                  <Svg width={16} height={16} viewBox="0 0 24 24" style={{ marginTop: 'auto' }}>
-                    <Path d="M9 18L15 12L9 6" stroke="#bbb" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-                  </Svg>
-                </View>
-              </TouchableOpacity>
-            );
-          })}
-
+          {parcelas.map((item: any, index: number) => (
+            <ParcelCard
+              key={item.id}
+              item={item}
+            />
+          ))}
         </View>
 
         <TouchableOpacity
@@ -142,8 +87,8 @@ export default function HomeScreen() {
             </Text>
           </View>
           <View style={styles.infoIcons}>
-            <WeatherCloudIcon/>
-            <PlantStemIcon/>
+            <WeatherCloudIcon />
+            <PlantStemIcon />
           </View>
         </View>
       </ScrollView>
