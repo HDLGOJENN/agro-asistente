@@ -53,7 +53,7 @@ export default function LoginScreen() {
       >
         <View style={styles.logoOverlay}>
           <LeaftIcon />
-          <Text style={styles.brandName}>AgroAlerta</Text>
+          <Text style={styles.brandName}>Chinampas</Text>
           <Text style={styles.brandSub}>
             Sistema de Alerta Temprana{'\n'}para Cultivos
           </Text>

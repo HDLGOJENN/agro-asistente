@@ -1,6 +1,16 @@
 import { create } from 'zustand';
 
-export const useAppStore = create((set) => ({
+interface User {
+  id: string;
+  nombre_completo?: string;
+}
+
+interface AppState {
+  user: User | null;
+  setUser: (user: User) => void;
+}
+
+export const useAppStore = create<AppState>((set) => ({
   user: null,
-  setUser: (user: any) => set({ user }),
+  setUser: (user) => set({ user }),
 }));

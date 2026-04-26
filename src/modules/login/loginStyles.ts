@@ -7,7 +7,7 @@ export default StyleSheet.create({
   },
   heroImage: {
     width: '100%',
-    height: 550,
+    height:550,
     justifyContent: 'flex-start',
   },
   logoOverlay: {

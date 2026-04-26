@@ -2,38 +2,56 @@ import {
   View,
   Text,
   TouchableOpacity,
-  StyleSheet,
   ScrollView,
-  SafeAreaView,
   StatusBar,
+  ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import Svg, { Path, Circle, Line } from 'react-native-svg';
+import Svg, { Path } from 'react-native-svg';
+
 import styles from './homeStyles';
-import { WeatherCloudIcon, PlantStemIcon } from '@/assets/svg'
-import { useParcelas } from '@/src/api/hooks/usesParcelas'
-import ParcelCard from '@/components/Parcelas/ParcelCard'
+import { WeatherCloudIcon, PlantStemIcon } from '@/assets/svg';
+import { useParcelas } from '@/src/api/hooks/usesParcelas';
+import ParcelCard from '@/components/Parcelas/ParcelCard';
 import { useAppStore } from '@/src/store/useAppStore';
 
 export default function HomeScreen() {
   const { parcelas } = useParcelas();
   const user = useAppStore((s) => s.user);
+
+  // 🛡️ Protección (evita crash APK)
+  if (!user) {
+    return (
+      <SafeAreaView style={styles.safe}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color="#2E7D32" />
+          <Text style={{ marginTop: 10 }}>Cargando usuario...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  console.log('👤 USER:', user);
+  console.log('🌱 PARCELAS:', parcelas);
+
   return (
     <SafeAreaView style={styles.safe}>
       <StatusBar barStyle="dark-content" backgroundColor="#F7F8F5" />
+
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
+        {/* HEADER */}
         <View style={styles.header}>
           <Text style={styles.greeting}>
-            Hola, {user?.nombre_completo || 'Usuario'}
+            Hola, {user.nombre_completo || 'Usuario'}
           </Text>
         </View>
 
-        {/* Alerta */}
+        {/* ALERTA */}
         <Text style={styles.sectionTitle}>Resumen de hoy</Text>
         <TouchableOpacity style={styles.alertCard} activeOpacity={0.85}>
           <View style={styles.alertIcon}>
@@ -42,50 +60,54 @@ export default function HomeScreen() {
               <Path d="M11 9H13V14H11V9ZM11 15H13V17H11V15Z" fill="#fff" />
             </Svg>
           </View>
+
           <View style={styles.alertBody}>
             <Text style={styles.alertLabel}>Riesgo ALTO</Text>
             <Text style={styles.alertTitle}>Helada en 8 horas</Text>
-            <Text style={styles.alertSub}>Afectará tu cultivo de Maíz</Text>
+            <Text style={styles.alertSub}>Afectará tu cultivo</Text>
           </View>
-          <Svg width={20} height={20} viewBox="0 0 24 24">
-            <Path d="M9 18L15 12L9 6" stroke="#F44336" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-          </Svg>
         </TouchableOpacity>
 
-        {/* Mis cultivos */}
+        {/* CULTIVOS */}
         <Text style={styles.sectionTitle}>Mis cultivos</Text>
 
         <View style={styles.cropsContainer}>
-          {parcelas.map((item: any, index: number) => (
-            <ParcelCard
-              key={item.id}
-              item={item}
-            />
-          ))}
+          {parcelas.length === 0 ? (
+            <Text style={{ padding: 16, color: '#999' }}>
+              Aún no tienes cultivos
+            </Text>
+          ) : (
+            parcelas.map((item: any) => (
+              <ParcelCard key={item.id} item={item} />
+            ))
+          )}
         </View>
 
+        {/* AGREGAR */}
         <TouchableOpacity
           style={styles.addCard}
-          activeOpacity={0.8}
           onPress={() => router.push('/add-crop')}
         >
           <View style={styles.plusCircle}>
             <Text style={styles.plusText}>+</Text>
           </View>
+
           <Text style={styles.addTitle}>Agregar cultivo</Text>
           <Text style={styles.addSub}>
-            Registra tu cultivo y parcela{'\n'}para monitorearlo
+            Registra tu cultivo y parcela
           </Text>
         </TouchableOpacity>
 
-        {/* ¿Cómo funciona? */}
+        {/* INFO */}
         <View style={styles.infoCard}>
           <View style={styles.infoText}>
             <Text style={styles.infoTitle}>¿Cómo funciona?</Text>
             <Text style={styles.infoBody}>
-              AgroAlerta monitorea el clima{'\n'}y te avisa para que tomes{'\n'}acción a tiempo.
+              AgroAlerta monitorea el clima{'\n'}
+              y te avisa para actuar a tiempo.
             </Text>
           </View>
+
           <View style={styles.infoIcons}>
             <WeatherCloudIcon />
             <PlantStemIcon />
