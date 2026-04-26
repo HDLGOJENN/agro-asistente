@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   ActivityIndicator,
   ImageBackground,
+  ScrollView,
 } from 'react-native';
 import { useState } from 'react';
 import { router } from 'expo-router';
@@ -24,15 +25,11 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     if (!phone) return;
-
     try {
       setLoading(true);
       setErrorMsg('');
-
       const user = await loginWithPhone(phone);
-
       setUser(user);
-
       router.replace('/(tabs)');
     } catch (error) {
       setErrorMsg('Número no registrado');
@@ -45,58 +42,62 @@ export default function LoginScreen() {
     <SafeAreaView style={styles.safe}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
-      {/* 🌄 HERO IMAGE */}
-      <ImageBackground
-        source={require('@/assets/images/hero-field.png')}
-        style={styles.heroImage}
-        resizeMode="cover"
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        keyboardShouldPersistTaps="handled"
+        bounces={false}
+        showsVerticalScrollIndicator={false}
       >
-        <View style={styles.logoOverlay}>
-          <LeaftIcon />
-          <Text style={styles.brandName}>Chinampas</Text>
-          <Text style={styles.brandSub}>
-            Sistema de Alerta Temprana{'\n'}para Cultivos
-          </Text>
-        </View>
-      </ImageBackground>
-
-      {/* 📦 CONTENIDO */}
-      <View style={styles.content}>
-        <Text style={styles.tagline}>
-          Protege tu cultivo,{'\n'}nosotros te avisamos.
-        </Text>
-
-        <View style={styles.inputWrap}>
-          <TextInput
-            placeholder="+52 55 1234 5678"
-            value={phone}
-            onChangeText={setPhone}
-            style={styles.phoneInput}
-            keyboardType="phone-pad"
-          />
-        </View>
-
-        <TouchableOpacity
-          style={styles.button}
-          onPress={handleLogin}
+        {/* 🌄 HERO IMAGE */}
+        <ImageBackground
+          source={require('@/assets/images/hero-field.png')}
+          style={styles.heroImage}
+          resizeMode="cover"
         >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.buttonText}>Continuar</Text>
-          )}
-        </TouchableOpacity>
+          <View style={styles.logoOverlay}>
+            <LeaftIcon />
+            <Text style={styles.brandName}>Chinampas</Text>
+            <Text style={styles.brandSub}>
+              Sistema de Alerta Temprana{'\n'}para Cultivos
+            </Text>
+          </View>
+        </ImageBackground>
 
-        {errorMsg && (
-          <Text style={{ color: 'red', marginTop: 10 }}>
-            {errorMsg}
+        {/* 📦 CONTENIDO */}
+        <View style={styles.content}>
+          <Text style={styles.tagline}>
+            Protege tu cultivo,{'\n'}nosotros te avisamos.
           </Text>
-        )}
 
-        <Text style={styles.footer}>
-          Te enviaremos alertas por WhatsApp y SMS.
-        </Text>
-      </View>
+          <View style={styles.inputWrap}>
+            <TextInput
+              placeholder="+52 55 1234 5678"
+              value={phone}
+              onChangeText={setPhone}
+              style={styles.phoneInput}
+              keyboardType="phone-pad"
+            />
+          </View>
+
+          <TouchableOpacity style={styles.button} onPress={handleLogin}>
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Continuar</Text>
+            )}
+          </TouchableOpacity>
+
+          {errorMsg && (
+            <Text style={{ color: 'red', marginTop: 10, textAlign: 'center' }}>
+              {errorMsg}
+            </Text>
+          )}
+
+          <Text style={styles.footer}>
+            Te enviaremos alertas por WhatsApp y SMS.
+          </Text>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
